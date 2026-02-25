@@ -16,17 +16,19 @@ dotenv.config();
 // Database Connection
 connectDB();
 
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: '*', // In production, replace with your client URL
+        origin: CLIENT_ORIGIN,
         methods: ['GET', 'POST']
     }
 });
 
 // Middlewares
-app.use(cors());
+app.use(cors({ origin: CLIENT_ORIGIN }));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(requestLogger);
