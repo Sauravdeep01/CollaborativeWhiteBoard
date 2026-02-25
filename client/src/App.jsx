@@ -3,6 +3,9 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Room from './pages/Room';
+import Profile from './pages/Profile';
+import Logic from './pages/Logic';
 import './App.css';
 
 function App() {
@@ -18,6 +21,18 @@ function App() {
         <Route
           path="/dashboard"
           element={token ? <Dashboard /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/profile"
+          element={token ? <Profile /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/logic"
+          element={token ? <Logic /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/room/:roomId"
+          element={token ? <Room /> : <Navigate to="/login" replace />}
         />
       </Routes>
     </Router>

@@ -122,3 +122,45 @@ export const login = async (req, res) => {
         });
     }
 };
+
+export const updateUser = async (req, res) => {
+    try {
+        const { name } = req.body;
+        const userId = req.user.id;
+
+        if (!name || name.trim().length < 2) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name must be at least 2 characters long'
+            });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            { name: name.trim() },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || 'Server error'
+        });
+    }
+};
