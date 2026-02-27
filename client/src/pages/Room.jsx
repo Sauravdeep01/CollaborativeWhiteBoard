@@ -31,7 +31,7 @@ import {
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-const SOCKET_SERVER = 'http://localhost:5000'; // Update this for production
+const SOCKET_SERVER = import.meta.env.VITE_API_URL || 'http://localhost:5000'; // Update this for production
 
 const TOOL = {
   pan: 'pan',
