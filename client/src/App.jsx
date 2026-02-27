@@ -8,9 +8,16 @@ import Profile from './pages/Profile';
 import Logic from './pages/Logic';
 import './App.css';
 
-function App() {
+// PrivateRoute checks token on every render (reactive to localStorage changes)
+function PrivateRoute({ children }) {
   const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
 
+function App() {
   return (
     <Router>
       <Routes>
@@ -20,19 +27,19 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route
           path="/dashboard"
-          element={token ? <Dashboard /> : <Navigate to="/login" replace />}
+          element={<PrivateRoute><Dashboard /></PrivateRoute>}
         />
         <Route
           path="/profile"
-          element={token ? <Profile /> : <Navigate to="/login" replace />}
+          element={<PrivateRoute><Profile /></PrivateRoute>}
         />
         <Route
           path="/logic"
-          element={token ? <Logic /> : <Navigate to="/login" replace />}
+          element={<PrivateRoute><Logic /></PrivateRoute>}
         />
         <Route
           path="/room/:roomId"
-          element={token ? <Room /> : <Navigate to="/login" replace />}
+          element={<PrivateRoute><Room /></PrivateRoute>}
         />
       </Routes>
     </Router>

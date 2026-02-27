@@ -27,12 +27,25 @@ const Dashboard = () => {
         const fetchSessions = async () => {
             try {
                 const token = localStorage.getItem('token');
+                if (!token) {
+                    setLoading(false);
+                    return;
+                }
                 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
                 const res = await fetch(`${API_URL}/api/rooms/recent`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
+
+                // If token is expired/invalid, log out gracefully
+                if (res.status === 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    navigate('/login');
+                    return;
+                }
+
                 const data = await res.json();
                 if (data.success) {
                     setSessions(data.sessions);
