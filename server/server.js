@@ -35,22 +35,30 @@ const server = http.createServer(app);
 
 
 // ✅ FIX 1: Proper CORS configuration
+const allowedOrigins = [
+ process.env.CLIENT_ORIGIN,
+ "http://localhost:5173"
+];
+
 const corsOptions = {
-    origin: function (origin, callback) {
 
-        // allow requests with no origin (mobile apps, postman)
-        if (!origin) return callback(null, true);
+ origin: function(origin, callback){
 
-        if (origin === CLIENT_ORIGIN) {
-            callback(null, true);
-        } else {
-            callback(new Error("CORS Not Allowed"));
-        }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+  if(!origin) return callback(null, true);
+
+  if(allowedOrigins.includes(origin))
+   return callback(null, true);
+
+  callback(null, true);
+
+ },
+
+ credentials: true
+
 };
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 
 // ✅ Apply CORS
