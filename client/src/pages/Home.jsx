@@ -29,10 +29,6 @@ const Home = () => {
                         Get Started
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
-
-                    <button className="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all w-full sm:w-auto">
-                        View Demo
-                    </button>
                 </div>
             </div>
 

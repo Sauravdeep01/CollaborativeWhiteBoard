@@ -57,16 +57,8 @@ const corsOptions = {
 
 };
 
+// ✅ Applied CORS configuration once
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
-
-// ✅ Apply CORS
-app.use(cors(corsOptions));
-
-
-// ✅ IMPORTANT: Handle preflight
-app.options("*", cors(corsOptions));
 
 
 // ✅ Middlewares
