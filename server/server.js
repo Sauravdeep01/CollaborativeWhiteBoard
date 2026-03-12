@@ -171,10 +171,9 @@ io.on("connection", (socket) => {
     });
 
     socket.on("draw", async ({ roomId, stroke }) => {
+        console.log(`[Draw] Room: ${roomId}, Stroke ID: ${stroke.id}`);
         socket.to(roomId).emit("draw", stroke);
         
-        // Update DB with the drawing data
-        // For pencil/erase we update the stroke if it exists, otherwise push
         try {
             const room = await Room.findOne({ roomId });
             if (room) {
@@ -183,8 +182,11 @@ io.on("connection", (socket) => {
                     room.whiteboardData[index] = stroke;
                 } else {
                     room.whiteboardData.push(stroke);
+                    // Clear redo stack on new stroke
+                    room.redoStack = [];
                 }
                 room.markModified('whiteboardData');
+                room.markModified('redoStack');
                 room.lastActive = Date.now();
                 await room.save();
             }
@@ -198,6 +200,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("chat-message", async ({ roomId, message }) => {
+        console.log(`[Chat] Room: ${roomId}, From: ${message.name}`);
         socket.to(roomId).emit("chat-message", message);
         try {
             await Room.findOneAndUpdate(
@@ -227,25 +230,42 @@ io.on("connection", (socket) => {
     });
 
     socket.on("undo", async (roomId) => {
+        console.log(`[Undo] Room: ${roomId}`);
         socket.to(roomId).emit("undo");
         try {
-            // Pop the last stroke from DB
-            await Room.findOneAndUpdate(
-                { roomId },
-                { 
-                    $pop: { whiteboardData: 1 },
-                    $set: { lastActive: Date.now() }
-                }
-            );
+            const room = await Room.findOne({ roomId });
+            if (room && room.whiteboardData.length > 0) {
+                const lastStroke = room.whiteboardData.pop();
+                room.redoStack.push(lastStroke);
+                room.markModified('whiteboardData');
+                room.markModified('redoStack');
+                room.lastActive = Date.now();
+                await room.save();
+            }
         } catch (err) {
             console.error("Error on undo:", err);
         }
     });
 
-    socket.on("redo", (roomId) => {
-        socket.to(roomId).emit("redo");
-        // Redo complex to handle in DB without a separate redo stack, 
-        // but we broadcast it at least for real-time.
+    socket.on("redo", async (roomId) => {
+        console.log(`[Redo] Room: ${roomId}`);
+        try {
+            const room = await Room.findOne({ roomId });
+            if (room && room.redoStack.length > 0) {
+                const stroke = room.redoStack.pop();
+                room.whiteboardData.push(stroke);
+                
+                // Broadcast to EVERYONE to add the stroke back
+                io.to(roomId).emit("draw", stroke);
+                
+                room.markModified('whiteboardData');
+                room.markModified('redoStack');
+                room.lastActive = Date.now();
+                await room.save();
+            }
+        } catch (err) {
+            console.error("Error on redo:", err);
+        }
     });
 
     socket.on("leave-room", async ({ roomId, userId }) => {

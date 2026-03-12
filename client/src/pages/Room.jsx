@@ -26,7 +26,9 @@ import {
   Lock,
   Unlock,
   ArrowLeft,
-  Box
+  Box,
+  MousePointer2,
+  Clock
 } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
@@ -538,6 +540,7 @@ const Room = () => {
     if (tool === TOOL.shape) {
       if (tempStrokeRef.current) {
         tempStrokeRef.current.points = [tempStrokeRef.current.points[0], pt];
+        socketRef.current?.emit('draw', { roomId, stroke: tempStrokeRef.current });
         redrawAll();
       }
       return;
@@ -991,6 +994,25 @@ const Room = () => {
                 onPointerUp={handlePointerUp}
                 onPointerLeave={handlePointerUp}
               />
+
+              {/* Peer Cursors */}
+              {Object.entries(peerCursors).map(([id, pc]) => (
+                <div
+                  key={id}
+                  className="absolute pointer-events-none z-[100] transition-all duration-100 ease-linear"
+                  style={{
+                    left: pc.x + offset.x,
+                    top: pc.y + offset.y,
+                  }}
+                >
+                  <div className="relative">
+                    <MousePointer2 className="w-5 h-5 text-indigo-500 fill-indigo-500 drop-shadow-md" />
+                    <div className="absolute left-4 top-4 px-2 py-1 bg-indigo-500 text-white text-[10px] font-bold rounded-lg whitespace-nowrap shadow-xl">
+                      {pc.name}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </main>
 

@@ -41,6 +41,10 @@ const roomSchema = new mongoose.Schema(
             type: Array,
             default: []
         },
+        redoStack: {
+            type: Array,
+            default: []
+        },
         chatHistory: [{
             name: String,
             text: String,
