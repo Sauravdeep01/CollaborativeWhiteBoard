@@ -759,7 +759,7 @@ const Room = () => {
                   <span className={`text-[10px] md:text-sm font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>{nameOfRoom}</span>
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 </div>
-                <div className="hidden sm:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-2">
                   <span className={`text-[8px] md:text-[10px] font-black tracking-[0.1em] uppercase ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>ID:</span>
                   <span className="text-[8px] md:text-[10px] font-bold text-indigo-500 tabular-nums">{roomId}</span>
                 </div>
@@ -778,7 +778,7 @@ const Room = () => {
           <div className="flex items-center gap-2 md:gap-4">
             <div className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 rounded-xl text-[10px] md:text-xs font-bold ${darkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'}`}>
               <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span><span className="hidden xs:inline">{users.length} </span>Online</span>
+              <span>{users.length} Online</span>
             </div>
 
             <button
@@ -953,21 +953,6 @@ const Room = () => {
               </button>
             </div>
           </aside>
-
-          {/* Mobile Bottom Toolbar */}
-          <div className="md:hidden absolute bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 p-2 rounded-2xl border-2 backdrop-blur-3xl shadow-2xl transition-all duration-500 bg-white/80 dark:bg-black/80 border-indigo-500/20">
-            <div className="flex gap-1.5 border-r border-slate-500/10 pr-2">
-              <ToolButton active={tool === TOOL.pencil} onClick={() => { setTool(TOOL.pencil); setShowSettings(true); setShowShapes(false); }} icon={Pencil} label="Pencil" />
-              <ToolButton active={tool === TOOL.eraser} onClick={() => { setTool(TOOL.eraser); setShowSettings(true); setShowShapes(false); }} icon={Eraser} label="Eraser" />
-              <ToolButton active={tool === TOOL.shape} onClick={() => { setTool(TOOL.shape); setShowShapes(true); setShowSettings(false); }} icon={Box} label="Shapes" />
-              <ToolButton active={tool === TOOL.pan} onClick={() => { setTool(TOOL.pan); setShowSettings(false); setShowShapes(false); }} icon={Hand} label="Pan" />
-            </div>
-            <div className="flex gap-1">
-              <button onClick={() => handleUndo()} className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-black/5 dark:hover:bg-white/5 opacity-70"><Undo2 className="w-4 h-4" /></button>
-              <button onClick={() => setIsLocked(!isLocked)} className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all ${isLocked ? 'bg-red-500 text-white' : 'opacity-70'}`}>{isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}</button>
-              <button onClick={() => handleClear()} className="w-9 h-9 flex items-center justify-center rounded-lg text-red-500/60"><Trash2 className="w-4 h-4" /></button>
-            </div>
-          </div>
 
           {/* Main Workspace */}
           <main className="flex-1 flex flex-col relative z-10 bg-transparent overflow-hidden">

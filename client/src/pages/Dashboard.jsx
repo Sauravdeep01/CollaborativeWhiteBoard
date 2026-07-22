@@ -90,7 +90,7 @@ const Dashboard = () => {
             <div className="absolute top-[-20%] left-[-10%] w-[55%] h-[55%] bg-blue-50 rounded-full blur-3xl opacity-60"></div>
             <div className="absolute bottom-[-25%] right-[-10%] w-[55%] h-[55%] bg-indigo-50 rounded-full blur-3xl opacity-60"></div>
 
-            <div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-6 sm:py-10">
+            <div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-6 md:py-10">
                 <header className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                         <div className="inline-flex items-center justify-center w-11 h-11 bg-white rounded-2xl shadow-md border border-slate-100">
@@ -131,9 +131,9 @@ const Dashboard = () => {
                     </div>
                 </header>
 
-                <main className="mt-10 sm:mt-14">
+                <main className="mt-10 md:mt-14">
                     <div className="max-w-2xl">
-                        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
                             Welcome back, <span className="text-blue-600">{username}</span>
                         </h1>
                         <p className="mt-2 text-slate-600 font-medium">
@@ -242,7 +242,7 @@ const Dashboard = () => {
                                     return (
                                         <div
                                             key={session._id}
-                                            className={`group p-6 rounded-[32px] bg-white border border-slate-100 hover:border-indigo-500/30 shadow-sm transition-all flex flex-col sm:flex-row items-center justify-between gap-6 ${!canJoin ? 'opacity-70 grayscale-[0.5]' : 'hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1'}`}
+                                            className={`group p-6 rounded-[32px] bg-white border border-slate-100 hover:border-indigo-500/30 shadow-sm transition-all flex flex-col md:flex-row items-center justify-between gap-6 ${!canJoin ? 'opacity-70 grayscale-[0.5]' : 'hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1'}`}
                                         >
                                             <div className="flex items-center gap-5">
                                                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors duration-500 ${isExpired ? 'bg-slate-100' : 'bg-indigo-50 group-hover:bg-indigo-500'}`}>

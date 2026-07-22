@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Tablet and laptop only — layout does not adapt below this width */
+html, body {
+  min-width: 768px;
+}
+
 @theme {
   --animate-card-in: card-in 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   --animate-shake: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);

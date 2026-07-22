@@ -87,7 +87,7 @@ const Signup = () => {
         <div className="min-h-screen flex bg-white font-sans text-slate-900">
             <AuthHero />
 
-            <div className="relative flex-1 flex items-center justify-center p-6 sm:p-10 overflow-hidden">
+            <div className="relative flex-1 flex items-center justify-center p-6 md:p-10 overflow-hidden">
                 <div className="absolute top-[-15%] right-[-15%] w-[50%] h-[50%] bg-indigo-50 rounded-full blur-3xl" />
 
                 <div className="relative z-10 w-full max-w-sm animate-card-in">
