@@ -18,6 +18,7 @@ import {
     Zap,
     Activity
 } from 'lucide-react';
+import { API_URL } from '../config';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -43,7 +44,6 @@ const Profile = () => {
         const fetchSessions = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
                 const res = await fetch(`${API_URL}/api/rooms/recent`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -76,7 +76,6 @@ const Profile = () => {
         setSaving(true);
         try {
             const token = localStorage.getItem('token');
-            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
             const res = await fetch(`${API_URL}/api/auth/update`, {
                 method: 'PATCH',
                 headers: {

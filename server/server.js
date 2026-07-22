@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 
 import app from './app.js';
 import connectDB from './db/connection.js';
-import { socketCorsOptions, CLIENT_ORIGIN } from './config/cors.js';
+import { socketCorsOptions } from './config/cors.js';
 import initSocket from './sockets/index.js';
 
 process.on('unhandledRejection', (reason) => {
@@ -28,8 +28,8 @@ const startServer = async () => {
 
     console.log('✅ All connections established');
 
-    server.listen(() => {
-        console.log("Server running successfully");
+    server.listen(PORT, () => {
+        console.log('Server running successfully');
     });
 };
 

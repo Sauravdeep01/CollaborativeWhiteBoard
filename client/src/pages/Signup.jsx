@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mail, Lock, UserPlus, ArrowRight, Layout, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../config';
 
 const Signup = () => {
     const [name, setName] = useState('');
@@ -12,7 +13,6 @@ const Signup = () => {
     const [errorMessage, setErrorMessage] = useState('');
 
     const navigate = useNavigate();
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     const passwordsMatch = password === confirmPassword;
     const showPasswordMismatch = confirmPassword.length > 0 && !passwordsMatch;

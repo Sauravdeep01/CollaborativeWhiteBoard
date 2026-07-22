@@ -32,8 +32,9 @@ import {
 } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { API_URL } from '../config';
 
-const SOCKET_SERVER = import.meta.env.VITE_API_URL || 'http://localhost:5000'; // Update this for production
+const SOCKET_SERVER = API_URL;
 
 const TOOL = {
   pan: 'pan',

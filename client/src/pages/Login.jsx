@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Layout, Mail, Lock, LogIn, ArrowRight, Github } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../config';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -10,7 +11,6 @@ const Login = () => {
     const [errorMessage, setErrorMessage] = useState('');
 
     const navigate = useNavigate();
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
