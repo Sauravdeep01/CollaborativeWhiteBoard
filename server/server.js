@@ -17,10 +17,6 @@ import Room from './models/Room.js';
 dotenv.config();
 
 
-// ✅ Connect Database
-connectDB();
-
-
 // ✅ Environment variables
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 const PORT = process.env.PORT || 5000;
@@ -326,16 +322,14 @@ io.on("connection", (socket) => {
 
 
 
+const startServer = async () => {
+    await connectDB();
 
-// ✅ Start server
-server.listen(PORT, () => {
+    console.log("✅ All connections established");
 
-    console.log(`
-========================================
-Server running successfully
-PORT: ${PORT}
-CLIENT_ORIGIN: ${CLIENT_ORIGIN}
-========================================
-`);
+    server.listen(() => {
+        console.log("Server running successfully");
+    });
+};
 
-});
+startServer();
