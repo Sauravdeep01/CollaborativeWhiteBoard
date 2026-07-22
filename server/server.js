@@ -327,8 +327,14 @@ const startServer = async () => {
 
     console.log("✅ All connections established");
 
-    server.listen(() => {
-        console.log("Server running successfully");
+    server.listen(PORT, () => {
+        console.log(`
+========================================
+Server running successfully
+PORT: ${PORT}
+CLIENT_ORIGIN: ${CLIENT_ORIGIN}
+========================================
+`);
     });
 };
 
