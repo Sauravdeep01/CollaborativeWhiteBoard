@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
-import { Layout, Mail, Lock, LogIn, ArrowRight, Github } from 'lucide-react';
+import { Mail, Lock, LogIn, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
+import AuthHero from '../components/AuthHero';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [shake, setShake] = useState(false);
 
     const navigate = useNavigate();
+
+    const emailTouched = email.length > 0;
+    const emailValid = EMAIL_REGEX.test(email);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -37,123 +45,131 @@ const Login = () => {
             const message = error?.response?.data?.message || error.message || 'Login failed';
             setErrorMessage(message);
             console.error('Login error:', message);
+            setShake(true);
+            setTimeout(() => setShake(false), 500);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] p-4 relative overflow-hidden font-sans">
-            {/* Background decorative elements */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100 rounded-full blur-3xl opacity-50"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-100 rounded-full blur-3xl opacity-50"></div>
+        <div className="min-h-screen flex bg-white font-sans">
+            <AuthHero />
 
-            <div className="w-full max-w-md z-10">
-                {/* Logo & Header */}
-                <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-xl mb-6 border border-slate-100 group transition-all duration-300 hover:scale-110">
-                        <Layout className="w-8 h-8 text-black group-hover:rotate-12 transition-transform" />
-                    </div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
-                        Collaborative Whiteboard
-                    </h1>
-                    <p className="text-slate-500 font-medium">
-                        Real-time collaboration made simple
-                    </p>
-                </div>
+            <div className="relative flex-1 flex items-center justify-center p-6 sm:p-10 overflow-hidden">
+                <div className="absolute top-[-15%] right-[-15%] w-[50%] h-[50%] bg-indigo-50 rounded-full blur-3xl" />
 
-                {/* Login Card */}
-                <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/40">
-                    <div className="mb-8 text-left">
-                        <h2 className="text-xl font-semibold text-slate-800">Welcome Back</h2>
-                        <p className="text-slate-500 text-sm mt-1">Please enter your details to sign in</p>
+                <div className="relative z-10 w-full max-w-sm animate-card-in">
+                    <div className="mb-10">
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">
+                            Welcome back
+                        </h1>
+                        <p className="text-slate-500 font-medium">
+                            Log in to jump back into your boards.
+                        </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className={`space-y-5 ${shake ? 'animate-shake' : ''}`}>
                         {errorMessage ? (
-                            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                            <div className="animate-banner-in flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                                <AlertCircle className="w-4 h-4 shrink-0" />
                                 {errorMessage}
                             </div>
                         ) : null}
-                        {/* Email Field */}
+
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2 ml-1">
                                 Email address
                             </label>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-black transition-colors" />
+                                    <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                                 </div>
                                 <input
                                     type="email"
                                     required
-                                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm"
+                                    className={`w-full pl-11 pr-11 py-3.5 bg-slate-50 border rounded-2xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all shadow-sm ${
+                                        emailTouched && !emailValid
+                                            ? 'border-red-300 focus:ring-red-400'
+                                            : 'border-slate-200 focus:ring-indigo-500'
+                                    }`}
                                     placeholder="name@example.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
+                                {emailTouched && (
+                                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                                        {emailValid ? (
+                                            <CheckCircle2 className="h-5 w-5 text-emerald-500 animate-pop" />
+                                        ) : (
+                                            <AlertCircle className="h-5 w-5 text-red-400" />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        {/* Password Field */}
                         <div>
                             <div className="flex justify-between items-center mb-2 px-1">
                                 <label className="text-sm font-semibold text-slate-700">
                                     Password
                                 </label>
-                                <a href="#" className="text-xs font-bold text-slate-900 hover:underline">
+                                <a href="#" className="text-xs font-bold text-indigo-600 hover:underline">
                                     Forgot password?
                                 </a>
                             </div>
                             <div className="relative group">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-black transition-colors" />
+                                    <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                                 </div>
                                 <input
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     required
-                                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm"
+                                    className="w-full pl-11 pr-11 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((v) => !v)}
+                                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-600 transition-colors"
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                </button>
                             </div>
                         </div>
 
-                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className={`w-full py-4 rounded-2xl font-semibold shadow-lg shadow-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group ${
-                                isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-slate-900 text-white hover:bg-black'
+                            className={`w-full py-4 rounded-2xl font-semibold shadow-lg shadow-indigo-200 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group ${
+                                isSubmitting
+                                    ? 'bg-slate-400 cursor-not-allowed'
+                                    : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-0.5'
                             }`}
                         >
-                            {isSubmitting ? 'Logging in…' : 'Log in'}
-                            <LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            {isSubmitting ? (
+                                <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <>
+                                    Log in
+                                    <LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </>
+                            )}
                         </button>
                     </form>
 
-                    {/* Divider */}
-                    <div className="my-8 border-t border-slate-100"></div>
-
-                    {/* Sign Up Link */}
-                    <p className="text-center text-sm text-slate-500 font-medium">
+                    <p className="mt-8 text-center text-sm text-slate-500 font-medium">
                         Don't have an account?{' '}
-                        <Link to="/signup" className="text-slate-900 font-bold hover:underline">
+                        <Link to="/signup" className="text-indigo-600 font-bold hover:underline">
                             Sign up
                         </Link>
                     </p>
-                </div>
 
-                {/* Footer Links */}
-                <div className="mt-8 text-center space-y-4">
-                    <p className="text-xs text-slate-400 px-6">
-                        By continuing, you agree to our{' '}
-                        <a href="#" className="underline decoration-slate-200 hover:text-slate-600 transition-colors">Terms of Service</a> and{' '}
-                        <a href="#" className="underline decoration-slate-200 hover:text-slate-600 transition-colors">Privacy Policy</a>
-                    </p>
-                    <div>
-                        <Link to="/" className="text-sm font-bold text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center gap-1 group">
+                    <div className="mt-6 text-center">
+                        <Link to="/" className="text-xs font-bold text-slate-400 hover:text-slate-700 transition-colors">
                             Back to Home
                         </Link>
                     </div>
