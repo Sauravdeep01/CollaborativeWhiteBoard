@@ -28,7 +28,8 @@ import {
   ArrowLeft,
   Box,
   MousePointer2,
-  Clock
+  Clock,
+  Crown
 } from 'lucide-react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
@@ -43,15 +44,14 @@ const TOOL = {
   shape: 'shape'
 };
 
-const SWATCHES = ['#0f172a', '#2563eb', '#7c3aed', '#db2777', '#ef4444', '#f59e0b', '#10b981'];
-
-const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-
 const Room = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [nameOfRoom, setNameOfRoom] = useState(location.state?.roomName || 'Untitled Whiteboard');
+  const [adminName, setAdminName] = useState('');
+  const [creatorId, setCreatorId] = useState('');
+  const [users, setUsers] = useState([]);
 
   const [tool, setTool] = useState(TOOL.pencil);
   const [color, setColor] = useState('#2563eb');
@@ -96,8 +96,6 @@ const Room = () => {
 
   const displayName = user?.name || user?.email || 'Guest';
 
-  const [users, setUsers] = useState([]);
-
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
   const socketRef = useRef(null);
@@ -111,7 +109,6 @@ const Room = () => {
   const chatEndRef = useRef(null);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const peerRef = useRef(null);
 
   const initCanvas = () => {
     const canvas = canvasRef.current;
@@ -330,8 +327,10 @@ const Room = () => {
       setExpirationMessage(message);
     });
 
-    socket.on('room-details', ({ name }) => {
-      setNameOfRoom(name);
+    socket.on('room-details', ({ name, creatorId, adminName }) => {
+      if (name) setNameOfRoom(name);
+      if (creatorId) setCreatorId(creatorId);
+      if (adminName) setAdminName(adminName);
     });
 
     socket.on('room-expired', ({ message }) => {
@@ -389,16 +388,7 @@ const Room = () => {
       });
     });
 
-    const handleBeforeUnload = (e) => {
-      // By default, we don't block, but we can if there are unsaved changes.
-      // However, per user request, we just want to ensure the room stays open.
-      // The room STAYING open is handled by the server (disconnect doesn't expire).
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
       socket.disconnect();
     };
   }, [roomId, displayName]);
@@ -612,14 +602,8 @@ const Room = () => {
   };
 
   const handleLeave = () => {
-    socketRef.current?.emit('leave-room', { roomId, userId: user?.id });
+    socketRef.current?.emit('leave-room', { roomId, userId: user?.id, userName: displayName });
     navigate('/dashboard');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
   };
 
   const handleScreenShare = async () => {
@@ -773,6 +757,13 @@ const Room = () => {
               {copied ? <Check className="w-3 md:w-3.5 h-3 md:h-3.5" /> : <Copy className="w-3 md:w-3.5 h-3 md:h-3.5" />}
               <span className="inline-flex">{copied ? 'Copied!' : 'Copy Room ID'}</span>
             </button>
+
+            {adminName && (
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-500 shadow-sm" title={`Admin: ${adminName}`}>
+                <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
+                <span className="text-[10px] font-black uppercase tracking-wider">Admin: {adminName}</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 md:gap-4">
@@ -790,10 +781,11 @@ const Room = () => {
 
             <button
               onClick={handleLeave}
-              className={`flex items-center gap-3 px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg ${darkMode ? 'bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white shadow-black/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:shadow-indigo-500/10'}`}
+              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg ${darkMode ? 'bg-red-500/20 text-red-300 border border-red-500/30 hover:bg-red-500/30 shadow-black/20' : 'bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 hover:shadow-red-500/10'}`}
+              title="Exit Room"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Leave Board</span>
+              <LogOut className="w-4 h-4 text-red-500" />
+              <span>Exit Room</span>
             </button>
           </div>
         </header>
@@ -1041,17 +1033,38 @@ const Room = () => {
             {activeTab === 'chat' ? (
               <div className="flex-1 flex flex-col min-h-0 touch-auto select-text">
                 <div className="flex-1 overflow-y-auto px-6 space-y-4 no-scrollbar">
-                  {messages.map((m) => (
-                    <div key={m.id} className={`flex flex-col gap-1.5 ${m.name === displayName ? 'items-end' : 'items-start'}`}>
-                      <div className="flex items-center gap-2 px-1">
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">{m.name}</span>
-                        <span className="text-[9px] opacity-30">{m.time}</span>
+                  {messages.map((m) => {
+                    const isSystem = m.name === 'System';
+                    const isMsgAdmin = m.isAdmin || (adminName && m.name === adminName && !isSystem);
+
+                    if (isSystem) {
+                      return (
+                        <div key={m.id} className="flex justify-center my-2">
+                          <div className="px-3.5 py-1.5 rounded-full bg-slate-500/10 border border-slate-500/20 text-slate-400 text-[10px] font-bold tracking-wide shadow-sm">
+                            {m.text}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div key={m.id} className={`flex flex-col gap-1.5 ${m.name === displayName ? 'items-end' : 'items-start'}`}>
+                        <div className="flex items-center gap-2 px-1">
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">{m.name}</span>
+                          {isMsgAdmin && (
+                            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[8px] font-black uppercase tracking-widest flex items-center gap-1">
+                              <Crown className="w-2.5 h-2.5" />
+                              ADMIN
+                            </span>
+                          )}
+                          <span className="text-[9px] opacity-30">{m.time}</span>
+                        </div>
+                        <div className={`text-sm px-4 py-3 rounded-2xl max-w-[90%] shadow-sm leading-relaxed ${m.name === displayName ? 'bg-indigo-500 text-white' : (darkMode ? 'bg-slate-800 text-slate-100' : 'bg-white border border-slate-200 text-slate-700')}`}>
+                          {m.text}
+                        </div>
                       </div>
-                      <div className={`text-sm px-4 py-3 rounded-2xl max-w-[90%] shadow-sm leading-relaxed ${m.name === 'System' ? 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 text-center w-full max-w-full' : (m.name === displayName ? 'bg-indigo-500 text-white' : (darkMode ? 'bg-slate-800 text-slate-100' : 'bg-white border border-slate-200 text-slate-700'))}`}>
-                        {m.text}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <div ref={chatEndRef} />
                 </div>
 
@@ -1109,22 +1122,33 @@ const Room = () => {
               <div className="flex-1 overflow-y-auto p-6 space-y-3 no-scrollbar">
                 <div className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-4">Active Collaborators</div>
                 <div className="flex-1 overflow-y-auto space-y-3 no-scrollbar touch-auto select-text">
-                  {users.map((u) => (
-                    <div key={u.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all hover:translate-x-1 ${darkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
-                      <div className="flex items-center gap-4">
-                        <div className="relative">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black ${darkMode ? 'bg-slate-800 text-indigo-400' : 'bg-indigo-50 text-indigo-500'}`}>
-                            {u.name.slice(0, 1)}
+                  {users.map((u) => {
+                    const isUserAdmin = u.isAdmin || (adminName && u.name === adminName);
+                    return (
+                      <div key={u.id} className={`flex items-center justify-between p-4 rounded-2xl border transition-all hover:translate-x-1 ${darkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-white border-slate-200 shadow-sm'}`}>
+                        <div className="flex items-center gap-4">
+                          <div className="relative">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black ${darkMode ? 'bg-slate-800 text-indigo-400' : 'bg-indigo-50 text-indigo-500'}`}>
+                              {u.name.slice(0, 1).toUpperCase()}
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-slate-900 bg-emerald-500" />
                           </div>
-                          <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-slate-900 bg-emerald-500" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-bold">{u.name}</span>
-                          <span className="text-[9px] uppercase font-black opacity-30 tracking-widest">{u.status}</span>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-bold">{u.name}</span>
+                              {isUserAdmin && (
+                                <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/30 text-[8px] font-black uppercase tracking-widest flex items-center gap-1">
+                                  <Crown className="w-2.5 h-2.5" />
+                                  ADMIN
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[9px] uppercase font-black opacity-30 tracking-widest">{u.status}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
