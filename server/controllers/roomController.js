@@ -1,26 +1,61 @@
 import Room from '../models/Room.js';
 import { nanoid } from 'nanoid';
 
+// Helper to generate or validate a unique room ID (Case-Insensitive check)
+const generateUniqueRoomId = async (customId = null) => {
+    if (customId && typeof customId === 'string' && customId.trim().length > 0) {
+        const cleanCustom = customId.trim();
+        const existing = await Room.findOne({
+            roomId: { $regex: new RegExp(`^${cleanCustom.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+        });
+        if (existing) {
+            return { error: `A room with code "${cleanCustom}" already exists. Please enter a different room code.` };
+        }
+        return { roomId: cleanCustom };
+    }
+
+    // Auto-generate a guaranteed unique roomId
+    let uniqueId = '';
+    let isUnique = false;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (!isUnique && attempts < maxAttempts) {
+        attempts++;
+        uniqueId = nanoid(10);
+        const existing = await Room.findOne({
+            roomId: { $regex: new RegExp(`^${uniqueId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+        });
+        if (!existing) {
+            isUnique = true;
+        }
+    }
+
+    if (!isUnique) {
+        uniqueId = `${nanoid(6)}-${Date.now().toString(36)}`;
+    }
+
+    return { roomId: uniqueId };
+};
+
 // 1. Create a new room explicitly in DB
 export const createRoom = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({
+                success: false,
+                message: 'User authentication required'
+            });
+        }
+
         const { name, roomId: customRoomId } = req.body;
 
-        const roomId = customRoomId ? customRoomId.trim() : nanoid(10);
-
-        // Check if room with this roomId already exists
-        const existing = await Room.findOne({
-            roomId: { $regex: new RegExp(`^${roomId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
-        });
-
-        if (existing) {
-            if (existing.status === 'expired') {
-                return res.status(400).json({ success: false, message: 'This room code has expired.' });
-            }
-            return res.status(200).json({
-                success: true,
-                room: existing
+        const { roomId, error } = await generateUniqueRoomId(customRoomId);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: error
             });
         }
 
@@ -31,18 +66,21 @@ export const createRoom = async (req, res) => {
             participantCount: 1,
             name: name?.trim() || 'Untitled Whiteboard',
             status: 'active',
-            lastActive: Date.now()
+            lastActive: Date.now(),
+            whiteboardData: [],
+            redoStack: [],
+            chatHistory: []
         });
 
         await room.save();
 
-        res.status(201).json({
+        return res.status(201).json({
             success: true,
             room
         });
     } catch (error) {
         console.error('Error in createRoom:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: error.message || 'Server error creating room'
         });
