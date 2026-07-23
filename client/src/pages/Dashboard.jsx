@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
     Layout, Plus, ArrowRight, User, LogOut, Users, Clock, Calendar,
     Sparkles, Search, Filter, Grid, List, Copy, Check,
-    Zap, RefreshCw, Compass, ShieldCheck, Flame, X, MousePointer2
+    Zap, RefreshCw, Compass, ShieldCheck, Flame, X
 } from 'lucide-react';
 import { nanoid } from 'nanoid';
 import { toast } from 'sonner';
@@ -13,6 +13,8 @@ const Dashboard = () => {
     const [roomCode, setRoomCode] = useState('');
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [joining, setJoining] = useState(false);
+    const [creating, setCreating] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState('all'); // 'all' | 'live' | 'expired'
     const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
@@ -37,8 +39,8 @@ const Dashboard = () => {
 
     const username = currentUser?.name || currentUser?.email?.split('@')[0] || 'Creator';
 
-    const normalizedRoomCode = roomCode.trim().toUpperCase();
-    const canJoin = normalizedRoomCode.length > 0;
+    const cleanRoomCode = roomCode.trim();
+    const canJoin = cleanRoomCode.length > 0;
 
     // Generate background space stars
     const stars = useMemo(() => {
@@ -56,7 +58,7 @@ const Dashboard = () => {
         });
     }, []);
 
-    // Interactive Cosmic Stardust Sparkle Particle & Constellation Trail Engine
+    // Interactive Cosmic Stardust Sparkle Particle Engine
     useEffect(() => {
         const canvas = particleCanvasRef.current;
         if (!canvas) return;
@@ -73,7 +75,6 @@ const Dashboard = () => {
         let animId;
 
         const handlePointerMove = (e) => {
-            // Spawn 2-3 cosmic stardust sparkles
             for (let i = 0; i < 2; i++) {
                 particlesRef.current.push({
                     x: e.clientX + (Math.random() - 0.5) * 8,
@@ -88,7 +89,6 @@ const Dashboard = () => {
                 });
             }
 
-            // Limit particle queue for maximum performance
             if (particlesRef.current.length > 80) {
                 particlesRef.current.splice(0, particlesRef.current.length - 80);
             }
@@ -96,7 +96,6 @@ const Dashboard = () => {
 
         window.addEventListener('pointermove', handlePointerMove, { passive: true });
 
-        // Helper to draw a glowing 4-point star sparkle
         const drawStarSparkle = (cx, cy, spikes, outerRadius, innerRadius, color, opacity) => {
             let rot = Math.PI / 2 * 3;
             let x = cx;
@@ -133,7 +132,6 @@ const Dashboard = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const particles = particlesRef.current;
 
-            // Draw constellation lines between close stardust particles
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
@@ -154,7 +152,6 @@ const Dashboard = () => {
                 }
             }
 
-            // Update & Draw stardust particles
             for (let i = 0; i < particles.length; i++) {
                 const p = particles[i];
                 p.x += p.vx;
@@ -218,21 +215,64 @@ const Dashboard = () => {
         setShowCreateModal(true);
     };
 
-    const handleModalSubmit = (e) => {
+    const handleModalSubmit = async (e) => {
         e.preventDefault();
-        if (!newRoomName.trim()) return;
-        const id = nanoid(10);
-        navigate(`/room/${id}`, {
-            state: {
-                roomName: newRoomName.trim()
+        if (!newRoomName.trim() || creating) return;
+
+        setCreating(true);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_URL}/api/rooms/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify({ name: newRoomName.trim() })
+            });
+
+            const data = await res.json();
+            if (data.success && data.room) {
+                setShowCreateModal(false);
+                toast.success('Whiteboard created successfully!');
+                navigate(`/room/${data.room.roomId}`, {
+                    state: { roomName: data.room.name }
+                });
+            } else {
+                toast.error(data.message || 'Failed to create room');
             }
-        });
+        } catch (error) {
+            console.error('Error creating room:', error);
+            toast.error('Error creating whiteboard session');
+        } finally {
+            setCreating(false);
+        }
     };
 
-    const handleJoinRoom = (e) => {
+    const handleJoinRoom = async (e) => {
         e.preventDefault();
-        if (!canJoin) return;
-        navigate(`/room/${normalizedRoomCode}`);
+        const codeToValidate = roomCode.trim();
+        if (!codeToValidate || joining) return;
+
+        setJoining(true);
+        try {
+            const res = await fetch(`${API_URL}/api/rooms/validate/${encodeURIComponent(codeToValidate)}`);
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                toast.error(data.message || 'Invalid room code. Room does not exist.');
+                setJoining(false);
+                return;
+            }
+
+            toast.success(`Joining ${data.name || 'whiteboard'}...`);
+            navigate(`/room/${data.roomId}`);
+        } catch (error) {
+            console.error('Error validating room code:', error);
+            toast.error('Unable to validate room code. Please check your network.');
+        } finally {
+            setJoining(false);
+        }
     };
 
     const handleCopyRoomId = (roomId, e) => {
@@ -306,7 +346,7 @@ const Dashboard = () => {
                 <div className="absolute inset-0 bg-grid-pattern-dark opacity-20" />
             </div>
 
-            {/* Interactive Cosmic Stardust & Constellation Particle Canvas (Renders OVER Divs) */}
+            {/* Interactive Cosmic Stardust & Constellation Particle Canvas */}
             <canvas
                 ref={particleCanvasRef}
                 className="pointer-events-none fixed inset-0 z-50"
@@ -456,8 +496,8 @@ const Dashboard = () => {
                                                 type="text"
                                                 value={roomCode}
                                                 onChange={(e) => setRoomCode(e.target.value)}
-                                                className="w-full px-4 py-3.5 pr-20 bg-[#030712] text-white border-2 border-slate-800 focus:border-purple-400 rounded-2xl text-base font-black placeholder:text-slate-500 focus:outline-none transition-all shadow-inner uppercase tracking-wider"
-                                                placeholder="e.g. X9K2L1P"
+                                                className="w-full px-4 py-3.5 pr-20 bg-[#030712] text-white border-2 border-slate-800 focus:border-purple-400 rounded-2xl text-base font-bold placeholder:text-slate-500 focus:outline-none transition-all shadow-inner"
+                                                placeholder="e.g. x9k2L1p"
                                             />
                                             <button
                                                 type="button"
@@ -472,14 +512,23 @@ const Dashboard = () => {
 
                                     <button
                                         type="submit"
-                                        disabled={!canJoin}
-                                        className={`w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2 group ${canJoin
+                                        disabled={!canJoin || joining}
+                                        className={`w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2 group ${canJoin && !joining
                                                 ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-purple-500/25 hover:-translate-y-0.5 active:translate-y-0'
                                                 : 'bg-slate-800/80 text-slate-500 font-bold cursor-not-allowed border border-slate-700/80'
                                             }`}
                                     >
-                                        Join Room Now
-                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        {joining ? (
+                                            <>
+                                                <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                                                Validating Code...
+                                            </>
+                                        ) : (
+                                            <>
+                                                Join Room Now
+                                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                            </>
+                                        )}
                                     </button>
                                 </form>
                             </div>
@@ -761,9 +810,17 @@ const Dashboard = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-2 px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold shadow-purple-500/25"
+                                    disabled={creating}
+                                    className="flex-2 px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold shadow-purple-500/25 flex items-center justify-center gap-2"
                                 >
-                                    Launch Board
+                                    {creating ? (
+                                        <>
+                                            <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Launch Board'
+                                    )}
                                 </button>
                             </div>
                         </div>
