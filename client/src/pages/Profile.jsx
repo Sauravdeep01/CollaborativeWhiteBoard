@@ -145,10 +145,10 @@ const Profile = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Left Column: User Info & Settings */}
                     <div className="lg:col-span-4 space-y-6">
-                        <section className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[32px] p-8 shadow-xl border border-white/50 dark:border-slate-800/50">
+                        <section className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-4xl p-8 shadow-xl border border-white/50 dark:border-slate-800/50">
                             <div className="flex flex-col items-center text-center space-y-4">
                                 <div className="relative">
-                                    <div className="w-24 h-24 rounded-[32px] bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-4xl font-black shadow-xl shadow-indigo-500/20">
+                                    <div className="w-24 h-24 rounded-4xl bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-4xl font-black shadow-xl shadow-indigo-500/20">
                                         {name.slice(0, 1).toUpperCase()}
                                     </div>
                                     <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-900" title="Online"></div>
@@ -199,7 +199,7 @@ const Profile = () => {
                         {/* Stats Grid */}
                         <div className="grid grid-cols-3 gap-4">
                             {stats.map((s, i) => (
-                                <div key={i} className="bg-white/80 dark:bg-slate-900/80 p-6 rounded-[32px] border border-white/50 dark:border-slate-800/50 shadow-sm flex flex-col items-center justify-center space-y-2 hover:shadow-md transition-all group">
+                                <div key={i} className="bg-white/80 dark:bg-slate-900/80 p-6 rounded-4xl border border-white/50 dark:border-slate-800/50 shadow-sm flex flex-col items-center justify-center space-y-2 hover:shadow-md transition-all group">
                                     <div className={`w-12 h-12 rounded-2xl ${s.bg} dark:bg-slate-800 ${s.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
                                         <s.icon className="w-6 h-6" />
                                     </div>
@@ -238,7 +238,7 @@ const Profile = () => {
                                     <p className="text-sm font-black uppercase tracking-widest text-slate-400">Loading Archive...</p>
                                 </div>
                             ) : filteredSessions.length === 0 ? (
-                                <div className="py-24 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[32px]">
+                                <div className="py-24 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-4xl">
                                     <div className="bg-slate-50 dark:bg-slate-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <Search className="w-6 h-6 text-slate-300" />
                                     </div>
@@ -253,7 +253,7 @@ const Profile = () => {
                                         return (
                                             <div
                                                 key={session._id}
-                                                className={`group flex flex-col md:flex-row items-center justify-between p-6 rounded-[32px] bg-slate-50/50 dark:bg-slate-800/30 transition-all border border-slate-100 dark:border-slate-800 ${!canJoin ? 'opacity-70 cursor-not-allowed' : 'hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 cursor-pointer'}`}
+                                                className={`group flex flex-col md:flex-row items-center justify-between p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-800/30 transition-all border border-slate-100 dark:border-slate-800 ${!canJoin ? 'opacity-70 cursor-not-allowed' : 'hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/5 cursor-pointer'}`}
                                                 onClick={() => canJoin && navigate(`/room/${session.roomId}`)}
                                             >
                                                 <div className="flex items-center gap-6 w-full">

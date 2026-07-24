@@ -141,14 +141,6 @@ const registerRoomHandlers = (io, socket, rooms) => {
         socket.to(roomId).emit('cursor-move', { id: socket.id, x, y, name });
     });
 
-    socket.on('start-sharing', ({ roomId, userName }) => {
-        socket.to(roomId).emit('screen-share-start', { streamId: socket.id, userName });
-    });
-
-    socket.on('stop-sharing', (roomId) => {
-        socket.to(roomId).emit('screen-share-stop', socket.id);
-    });
-
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
 

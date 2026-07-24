@@ -14,7 +14,7 @@ const FEATURES = [
 ];
 
 const AuthHero = () => (
-    <div className="relative hidden md:flex flex-col justify-between w-1/2 min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 p-8 md:p-12 text-white">
+    <div className="relative hidden md:flex flex-col justify-between w-1/2 min-h-screen overflow-hidden bg-linear-to-br from-slate-950 via-indigo-950 to-violet-950 p-8 md:p-12 text-white">
         <div
             className="absolute inset-0 opacity-[0.07]"
             style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '28px 28px' }}

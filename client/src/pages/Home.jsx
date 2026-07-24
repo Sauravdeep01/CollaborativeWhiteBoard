@@ -45,7 +45,7 @@ const Home = () => {
 
     return (
         <div className="bg-white font-sans text-slate-900">
-            <section className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-4 bg-gradient-to-br from-indigo-400 via-violet-400 to-fuchsia-400">
+            <section className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-4 bg-linear-to-br from-indigo-400 via-violet-400 to-fuchsia-400">
                 <div
                     className="absolute inset-0 opacity-[0.08]"
                     style={{ backgroundImage: 'radial-gradient(#1e1b4b 1px, transparent 1px)', backgroundSize: '28px 28px' }}
@@ -81,7 +81,7 @@ const Home = () => {
 
                     <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6 text-slate-900">
                         Collaborate without{' '}
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-orange-600">limits</span>.
+                        <span className="text-transparent bg-clip-text bg-linear-to-r from-amber-700 to-orange-600">limits</span>.
                     </h1>
 
                     <p className="text-xl text-slate-800 mb-12 leading-relaxed max-w-lg mx-auto font-medium">
@@ -125,8 +125,8 @@ const Home = () => {
                 </div>
             </section>
 
-            <section className="relative px-4 py-20 bg-gradient-to-b from-white via-indigo-50 to-violet-100">
-                <div className="max-w-4xl mx-auto rounded-[40px] bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 p-12 md:p-16 text-center text-white overflow-hidden relative">
+            <section className="relative px-4 py-20 bg-linear-to-b from-white via-indigo-50 to-violet-100">
+                <div className="max-w-4xl mx-auto rounded-[40px] bg-linear-to-br from-slate-950 via-indigo-950 to-violet-950 p-12 md:p-16 text-center text-white overflow-hidden relative">
                     <div
                         className="absolute inset-0 opacity-[0.07]"
                         style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '28px 28px' }}

@@ -243,7 +243,7 @@ const Signup = () => {
                             className={`w-full py-4 rounded-2xl font-semibold shadow-lg shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-2 group ${
                                 !passwordsMatch || isSubmitting
                                     ? 'bg-slate-300 text-slate-600 cursor-not-allowed'
-                                    : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-0.5 active:scale-[0.98]'
+                                    : 'bg-linear-to-r from-indigo-600 to-violet-600 text-white hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-0.5 active:scale-[0.98]'
                             }`}
                         >
                             {isSubmitting ? (

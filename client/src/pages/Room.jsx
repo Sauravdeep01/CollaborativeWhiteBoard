@@ -17,7 +17,6 @@ import {
   Send,
   Palette,
   Upload,
-  Monitor,
   Moon,
   Sun,
   Square,
@@ -50,7 +49,7 @@ const Room = () => {
   const location = useLocation();
   const [nameOfRoom, setNameOfRoom] = useState(location.state?.roomName || 'Untitled Whiteboard');
   const [adminName, setAdminName] = useState('');
-  const [creatorId, setCreatorId] = useState('');
+  const [, setCreatorId] = useState('');
   const [users, setUsers] = useState([]);
 
   const [tool, setTool] = useState(TOOL.pencil);
@@ -69,9 +68,6 @@ const Room = () => {
   const [resizing, setResizing] = useState(null);
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
-  const [remoteStream, setRemoteStream] = useState(null);
-  const [screenStream, setScreenStream] = useState(null);
 
   const [activeTab, setActiveTab] = useState('chat');
   const [chatInput, setChatInput] = useState('');
@@ -107,8 +103,6 @@ const Room = () => {
   const imageCacheRef = useRef({});
   const fileInputRef = useRef(null);
   const chatEndRef = useRef(null);
-  const localVideoRef = useRef(null);
-  const remoteVideoRef = useRef(null);
 
   const initCanvas = () => {
     const canvas = canvasRef.current;
@@ -259,20 +253,12 @@ const Room = () => {
   useEffect(() => {
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
     redrawAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [darkMode]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, activeTab]);
-
-  useEffect(() => {
-    if (isSharing && screenStream && localVideoRef.current) {
-      localVideoRef.current.srcObject = screenStream;
-    }
-    if (remoteStream && remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = remoteStream;
-    }
-  }, [isSharing, screenStream, remoteStream]);
 
   useEffect(() => {
     // Socket Initialization
@@ -367,19 +353,6 @@ const Room = () => {
       setPeerCursors(prev => ({ ...prev, [id]: { x, y, name } }));
     });
 
-    socket.on('screen-share-start', ({ streamId, userName }) => {
-      setMessages(prev => [...prev, {
-        id: Date.now(),
-        name: 'System',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        text: `${userName} started screen sharing.`
-      }]);
-    });
-
-    socket.on('screen-share-stop', () => {
-      setRemoteStream(null);
-    });
-
     socket.on('user-left', (id) => {
       setPeerCursors(prev => {
         const next = { ...prev };
@@ -391,6 +364,7 @@ const Room = () => {
     return () => {
       socket.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, displayName]);
 
   useEffect(() => {
@@ -410,6 +384,7 @@ const Room = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getPoint = (e) => {
@@ -606,34 +581,6 @@ const Room = () => {
     navigate('/dashboard');
   };
 
-  const handleScreenShare = async () => {
-    if (isSharing) {
-      screenStream?.getTracks().forEach(track => track.stop());
-      setScreenStream(null);
-      setIsSharing(false);
-      socketRef.current?.emit('stop-sharing', roomId);
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { displaySurface: 'monitor' },
-        audio: false
-      });
-      setScreenStream(stream);
-      setIsSharing(true);
-
-      socketRef.current?.emit('start-sharing', { roomId, userName: displayName });
-
-      stream.getVideoTracks()[0].onended = () => {
-        setIsSharing(false);
-        setScreenStream(null);
-        socketRef.current?.emit('stop-sharing', roomId);
-      };
-    } catch (err) {
-      console.error("Error sharing screen:", err);
-    }
-  };
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -719,7 +666,7 @@ const Room = () => {
   );
 
   return (
-    <div className={`fixed inset-0 h-[100dvh] w-screen flex flex-col font-sans transition-all duration-700 overflow-hidden touch-none select-none overscroll-none ${darkMode ? 'bg-[#0f111a] text-slate-200' : 'bg-[#f4f7fb] text-slate-800'}`}>
+    <div className={`fixed inset-0 h-dvh w-screen flex flex-col font-sans transition-all duration-700 overflow-hidden touch-none select-none overscroll-none ${darkMode ? 'bg-[#0f111a] text-slate-200' : 'bg-[#f4f7fb] text-slate-800'}`}>
       {/* Dynamic Background Elements */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div className={`absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full blur-[150px] transition-colors duration-1000 ${darkMode ? 'bg-indigo-900/10' : 'bg-indigo-100'}`} />
@@ -744,7 +691,7 @@ const Room = () => {
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 </div>
                 <div className="hidden md:flex items-center gap-2">
-                  <span className={`text-[8px] md:text-[10px] font-black tracking-[0.1em] uppercase ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>ID:</span>
+                  <span className={`text-[8px] md:text-[10px] font-black tracking-widest uppercase ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>ID:</span>
                   <span className="text-[8px] md:text-[10px] font-bold text-indigo-500 tabular-nums">{roomId}</span>
                 </div>
               </div>
@@ -792,7 +739,7 @@ const Room = () => {
 
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
           {/* Left Tools Sidebar - Hidden on mobile, shown as bottom bar */}
-          <aside className={`hidden md:flex relative z-20 w-[84px] flex-col items-center py-6 border-r transition-colors duration-500 gap-8 ${darkMode ? 'bg-black/20 border-white/5' : 'bg-white/50 border-slate-200 backdrop-blur-sm'}`}>
+          <aside className={`hidden md:flex relative z-20 w-21 flex-col items-center py-6 border-r transition-colors duration-500 gap-8 ${darkMode ? 'bg-black/20 border-white/5' : 'bg-white/50 border-slate-200 backdrop-blur-sm'}`}>
             <div className="relative flex items-center">
               <div className={`flex flex-col gap-2 p-1.5 rounded-2xl ${darkMode ? 'bg-white/5' : 'bg-slate-200/50'}`}>
                 <ToolButton
@@ -838,7 +785,7 @@ const Room = () => {
 
               {/* Shapes Panel */}
               {showShapes && tool === TOOL.shape && (
-                <div className={`absolute left-[82px] top-10 flex gap-2 p-3 rounded-[22px] border-2 shadow-[0_10px_40px_rgba(0,0,0,0.1)] backdrop-blur-3xl transition-all duration-500 animate-in fade-in zoom-in-95 slide-in-from-left-4 z-[100] ${darkMode ? 'bg-black/80 border-indigo-500/30' : 'bg-white border-indigo-500/20'}`}>
+                <div className={`absolute left-20.5 top-10 flex gap-2 p-3 rounded-[22px] border-2 shadow-[0_10px_40px_rgba(0,0,0,0.1)] backdrop-blur-3xl transition-all duration-500 animate-in fade-in zoom-in-95 slide-in-from-left-4 z-100 ${darkMode ? 'bg-black/80 border-indigo-500/30' : 'bg-white border-indigo-500/20'}`}>
                   <button onClick={() => { setSelectedShape('rect'); setShowShapes(false); }} title="Rectangle" className={`p-2 rounded-lg transition-all ${selectedShape === 'rect' ? 'bg-indigo-500 text-white' : 'hover:bg-indigo-500/10'}`}><Square className="w-5 h-5" /></button>
                   <button onClick={() => { setSelectedShape('circle'); setShowShapes(false); }} title="Circle" className={`p-2 rounded-lg transition-all ${selectedShape === 'circle' ? 'bg-indigo-500 text-white' : 'hover:bg-indigo-500/10'}`}><Circle className="w-5 h-5" /></button>
                   <button onClick={() => { setSelectedShape('triangle'); setShowShapes(false); }} title="Triangle" className={`p-2 rounded-lg transition-all ${selectedShape === 'triangle' ? 'bg-indigo-500 text-white' : 'hover:bg-indigo-500/10'}`}><Triangle className="w-5 h-5" /></button>
@@ -848,11 +795,11 @@ const Room = () => {
 
               {/* Tool Settings Panel (Pencil or Eraser) */}
               {showSettings && (tool === TOOL.pencil || tool === TOOL.eraser) && (
-                <div className={`absolute left-[82px] top-0 flex flex-col gap-3.5 p-4 rounded-[22px] border-2 shadow-[0_10px_40px_rgba(0,0,0,0.15)] backdrop-blur-3xl transition-all duration-500 animate-in fade-in zoom-in-95 slide-in-from-left-4 z-[100] group/settings hover:scale-[1.02] hover:shadow-indigo-500/20 ${darkMode ? 'bg-black/80 border-indigo-500/30' : 'bg-white border-indigo-500/20'}`}>
+                <div className={`absolute left-20.5 top-0 flex flex-col gap-3.5 p-4 rounded-[22px] border-2 shadow-[0_10px_40px_rgba(0,0,0,0.15)] backdrop-blur-3xl transition-all duration-500 animate-in fade-in zoom-in-95 slide-in-from-left-4 z-100 group/settings hover:scale-[1.02] hover:shadow-indigo-500/20 ${darkMode ? 'bg-black/80 border-indigo-500/30' : 'bg-white border-indigo-500/20'}`}>
                   {/* Glowing Indicator Arrow */}
                   <div className={`absolute -left-2 top-5 w-4 h-4 rotate-45 border-l-2 border-b-2 shadow-[-4px_4px_10px_rgba(99,102,241,0.1)] ${darkMode ? 'bg-black border-indigo-500/30' : 'bg-white border-indigo-500/20'}`} />
 
-                  <div className="flex flex-col gap-2 min-w-[130px]">
+                  <div className="flex flex-col gap-2 min-w-32.5">
                     <div className="flex justify-between items-center px-1">
                       <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>
                         {tool === TOOL.eraser ? 'Eraser' : 'Stroke'}
@@ -873,8 +820,8 @@ const Room = () => {
 
                   {tool === TOOL.pencil && (
                     <>
-                      <div className={`h-[1px] w-full ${darkMode ? 'bg-white/5' : 'bg-slate-50'}`} />
-                      <div className="flex flex-col gap-2 min-w-[130px]">
+                      <div className={`h-px w-full ${darkMode ? 'bg-white/5' : 'bg-slate-50'}`} />
+                      <div className="flex flex-col gap-2 min-w-32.5">
                         <div className="flex justify-between items-center px-1">
                           <span className={`text-[9px] font-black uppercase tracking-[0.2em] ${darkMode ? 'text-slate-500' : 'text-slate-500'}`}>Opacity</span>
                           <span className={`text-[11px] font-black ${darkMode ? 'text-indigo-400' : 'text-black'}`}>{Math.round(opacity * 100)}%</span>
@@ -948,21 +895,7 @@ const Room = () => {
 
           {/* Main Workspace */}
           <main className="flex-1 flex flex-col relative z-10 bg-transparent overflow-hidden">
-            <div className={`flex-1 m-2 md:m-6 rounded-2xl md:rounded-[32px] overflow-hidden relative group/canvas border-2 transition-all duration-700 ${isSharing || remoteStream ? 'bg-black border-indigo-500/40 shadow-2xl shadow-indigo-500/20' : (darkMode ? 'bg-slate-900 border-white/10 shadow-[0_30px_100px_-12px_rgba(0,0,0,0.6)]' : 'bg-white border-slate-200 shadow-[0_40px_100px_-20px_rgba(99,102,241,0.15)]')}`}>
-
-              {/* Redundant controls removed - moved to Tool Sidebar settings */}
-
-              <div className={`absolute inset-0 z-0 ${(isSharing || remoteStream) ? 'bg-black' : 'bg-transparent'}`}>
-                {(isSharing || remoteStream) && (
-                  <video
-                    ref={isSharing ? localVideoRef : remoteVideoRef}
-                    autoPlay
-                    muted={isSharing} // Mute local but not remote if audio exists
-                    playsInline
-                    className="w-full h-full object-contain pointer-events-none"
-                  />
-                )}
-              </div>
+            <div className={`flex-1 m-2 md:m-6 rounded-2xl md:rounded-4xl overflow-hidden relative group/canvas border-2 transition-all duration-700 ${darkMode ? 'bg-slate-900 border-white/10 shadow-[0_30px_100px_-12px_rgba(0,0,0,0.6)]' : 'bg-white border-slate-200 shadow-[0_40px_100px_-20px_rgba(99,102,241,0.15)]'}`}>
 
               <canvas
                 ref={canvasRef}
@@ -977,7 +910,7 @@ const Room = () => {
               {Object.entries(peerCursors).map(([id, pc]) => (
                 <div
                   key={id}
-                  className="absolute pointer-events-none z-[100] transition-all duration-100 ease-linear"
+                  className="absolute pointer-events-none z-100 transition-all duration-100 ease-linear"
                   style={{
                     left: pc.x + offset.x,
                     top: pc.y + offset.y,
@@ -1004,7 +937,7 @@ const Room = () => {
           )}
 
           {/* Right Sidebar - Slide over on mobile */}
-          <aside className={`fixed lg:relative top-0 right-0 h-full lg:h-auto w-80 md:w-96 lg:w-[400px] z-[60] lg:z-20 flex flex-col border-l transition-all duration-500 ease-in-out transform ${showMobileChat ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'} ${darkMode ? 'bg-[#1a1c2a] border-white/5' : 'bg-white border-slate-200 shadow-2xl lg:shadow-none'}`}>
+          <aside className={`fixed lg:relative top-0 right-0 h-full lg:h-auto w-80 md:w-96 lg:w-100 z-60 lg:z-20 flex flex-col border-l transition-all duration-500 ease-in-out transform ${showMobileChat ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'} ${darkMode ? 'bg-[#1a1c2a] border-white/5' : 'bg-white border-slate-200 shadow-2xl lg:shadow-none'}`}>
             <header className="p-6 flex items-center justify-between border-b border-transparent">
               <div className={`flex p-1.5 rounded-2xl w-full ${darkMode ? 'bg-black/30' : 'bg-slate-100'}`}>
                 <button
@@ -1101,14 +1034,6 @@ const Room = () => {
                     </button>
 
                     <button
-                      onClick={handleScreenShare}
-                      className={`w-full flex items-center justify-center gap-3 p-3.5 rounded-2xl border transition-all hover:-translate-y-0.5 active:translate-y-0 ${isSharing ? 'bg-red-500 text-white border-red-400' : (darkMode ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-white border-slate-200 shadow-sm hover:shadow-md')}`}
-                    >
-                      <Monitor className={`w-4 h-4 ${isSharing ? 'text-white' : 'text-emerald-500'}`} />
-                      <span className="text-xs font-bold">{isSharing ? 'Stop Sharing' : 'Share Screen'}</span>
-                    </button>
-
-                    <button
                       onClick={() => setDarkMode(!darkMode)}
                       className={`w-full flex items-center justify-center gap-3 p-3.5 rounded-2xl border transition-all hover:-translate-y-0.5 active:translate-y-0 ${darkMode ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-slate-900 text-white shadow-xl shadow-black/10'}`}
                     >
@@ -1156,7 +1081,7 @@ const Room = () => {
         </div>
         {/* Room Expired Overlay */}
         {isExpiredByAdmin && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all animate-in fade-in duration-500">
+          <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all animate-in fade-in duration-500">
             <div className={`relative w-full max-w-sm rounded-[40px] p-10 shadow-3xl text-center border ${darkMode ? 'bg-slate-900 border-white/5' : 'bg-white border-slate-100'}`}>
               <div className="w-20 h-20 rounded-3xl bg-red-50 dark:bg-red-900/20 text-red-500 flex items-center justify-center mx-auto mb-6">
                 <Clock className="w-10 h-10 animate-pulse" />

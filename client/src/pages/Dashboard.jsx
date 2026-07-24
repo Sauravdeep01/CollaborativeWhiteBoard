@@ -358,7 +358,7 @@ const Dashboard = () => {
                 {/* Top Navigation Header Container (Level 1: #0f172a Dark Slate Glass) */}
                 <header className="flex items-center justify-between gap-4 p-4 md:px-6 rounded-3xl bg-[#0f172a]/95 text-white border border-slate-800 shadow-2xl backdrop-blur-xl transition-all">
                     <div className="flex items-center gap-3.5">
-                        <div className="group relative inline-flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-500 rounded-2xl shadow-lg shadow-purple-500/30 hover:scale-105 active:scale-95 transition-transform cursor-pointer">
+                        <div className="group relative inline-flex items-center justify-center w-12 h-12 bg-linear-to-tr from-purple-600 via-indigo-600 to-pink-500 rounded-2xl shadow-lg shadow-purple-500/30 hover:scale-105 active:scale-95 transition-transform cursor-pointer">
                             <Layout className="w-6 h-6 text-white transform group-hover:rotate-12 transition-transform duration-300" />
                             <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -367,7 +367,7 @@ const Dashboard = () => {
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <span className="text-lg md:text-xl font-black tracking-tight bg-gradient-to-r from-purple-400 via-pink-300 to-amber-300 bg-clip-text text-transparent">
+                                <span className="text-lg md:text-xl font-black tracking-tight bg-linear-to-r from-purple-400 via-pink-300 to-amber-300 bg-clip-text text-transparent">
                                     Whiteboard Live
                                 </span>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] uppercase tracking-widest border bg-purple-500/20 text-purple-300 border-purple-500/40 font-extrabold">
@@ -387,7 +387,7 @@ const Dashboard = () => {
                         <button
                             type="button"
                             onClick={handleCreateRoom}
-                            className="px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2 group bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-500/30"
+                            className="px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2 group bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-500/30"
                         >
                             <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
                             <span className="hidden sm:inline">New Board</span>
@@ -421,7 +421,7 @@ const Dashboard = () => {
                         {/* Welcome Column Box (Level 1: #0f172a Dark Slate Glass Card) */}
                         <div className="lg:col-span-2 p-8 rounded-3xl bg-[#0f172a]/95 text-white border border-slate-800 shadow-2xl backdrop-blur-xl relative overflow-hidden flex flex-col justify-between">
                             {/* Decorative Corner Glow */}
-                            <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-purple-600/15 via-pink-600/10 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+                            <div className="absolute top-0 right-0 w-72 h-72 bg-linear-to-bl from-purple-600/15 via-pink-600/10 to-transparent rounded-full blur-2xl pointer-events-none"></div>
 
                             <div>
                                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold mb-4">
@@ -431,7 +431,7 @@ const Dashboard = () => {
 
                                 <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight text-white">
                                     Welcome back,{' '}
-                                    <span className="bg-gradient-to-r from-purple-400 via-pink-300 to-amber-300 bg-clip-text text-transparent">
+                                    <span className="bg-linear-to-r from-purple-400 via-pink-300 to-amber-300 bg-clip-text text-transparent">
                                         {username}!
                                     </span> 👋
                                 </h1>
@@ -473,7 +473,7 @@ const Dashboard = () => {
                         <div className="p-8 rounded-3xl bg-[#0f172a]/95 text-white border border-slate-800 shadow-2xl backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/40 transition-all duration-300">
                             <div>
                                 <div className="flex items-center justify-between">
-                                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25">
+                                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-linear-to-tr from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/25">
                                         <Compass className="w-6 h-6 animate-spin-slow" />
                                     </div>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-purple-300 bg-purple-500/15 px-3 py-1 rounded-full border border-purple-500/30">
@@ -514,7 +514,7 @@ const Dashboard = () => {
                                         type="submit"
                                         disabled={!canJoin || joining}
                                         className={`w-full py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2 group ${canJoin && !joining
-                                                ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-purple-500/25 hover:-translate-y-0.5 active:translate-y-0'
+                                                ? 'bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-purple-500/25 hover:-translate-y-0.5 active:translate-y-0'
                                                 : 'bg-slate-800/80 text-slate-500 font-bold cursor-not-allowed border border-slate-700/80'
                                             }`}
                                     >
@@ -645,7 +645,7 @@ const Dashboard = () => {
                                             className={`group relative p-6 rounded-3xl bg-[#1e293b] text-white border border-slate-700/80 shadow-xl hover:border-purple-500/50 hover:shadow-purple-500/15 transition-all duration-300 flex flex-col justify-between ${canOpen ? 'cursor-pointer hover:-translate-y-1' : 'opacity-65'}`}
                                         >
                                             {/* Top Card Gradient Accent Header */}
-                                            <div className={`h-2.5 rounded-t-3xl -mx-6 -mt-6 mb-4 bg-gradient-to-r ${isExpired ? 'from-slate-700 to-slate-800' : 'from-purple-500 via-pink-500 to-amber-500'}`} />
+                                            <div className={`h-2.5 rounded-t-3xl -mx-6 -mt-6 mb-4 bg-linear-to-r ${isExpired ? 'from-slate-700 to-slate-800' : 'from-purple-500 via-pink-500 to-amber-500'}`} />
 
                                             <div>
                                                 <div className="flex items-start justify-between gap-3 mb-3">
@@ -768,14 +768,14 @@ const Dashboard = () => {
 
             {/* Create Room Modal */}
             {showCreateModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-md transition-opacity" onClick={() => setShowCreateModal(false)}></div>
                     <form
                         onSubmit={handleModalSubmit}
-                        className="relative w-full max-w-md bg-[#0f172a] text-white border border-slate-800 rounded-[32px] p-8 shadow-2xl animate-in zoom-in-95 duration-200 z-10 space-y-6"
+                        className="relative w-full max-w-md bg-[#0f172a] text-white border border-slate-800 rounded-4xl p-8 shadow-2xl animate-in zoom-in-95 duration-200 z-10 space-y-6"
                     >
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30">
+                            <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30">
                                 <Plus className="w-6 h-6" />
                             </div>
                             <div>
@@ -811,7 +811,7 @@ const Dashboard = () => {
                                 <button
                                     type="submit"
                                     disabled={creating}
-                                    className="flex-2 px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold shadow-purple-500/25 flex items-center justify-center gap-2"
+                                    className="flex-2 px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold shadow-purple-500/25 flex items-center justify-center gap-2"
                                 >
                                     {creating ? (
                                         <>

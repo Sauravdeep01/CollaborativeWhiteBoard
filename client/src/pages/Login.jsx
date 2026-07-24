@@ -147,7 +147,7 @@ const Login = () => {
                             className={`w-full py-4 rounded-2xl font-semibold shadow-lg shadow-indigo-200 active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 group ${
                                 isSubmitting
                                     ? 'bg-slate-400 cursor-not-allowed'
-                                    : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-0.5'
+                                    : 'bg-linear-to-r from-indigo-600 to-violet-600 text-white hover:shadow-xl hover:shadow-indigo-300 hover:-translate-y-0.5'
                             }`}
                         >
                             {isSubmitting ? (

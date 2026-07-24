@@ -57,7 +57,7 @@ const Logic = () => {
                     </div>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white leading-none">
                         How Whiteboard <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-violet-400 to-emerald-400">Processes Reality.</span>
+                        <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 via-violet-400 to-emerald-400">Processes Reality.</span>
                     </h1>
                     <p className="max-w-xl text-slate-500 font-medium leading-relaxed">
                         A deep dive into the collaborative engine powering your whiteboard. From low-level canvas rendering to real-time event virtualization.
@@ -67,7 +67,7 @@ const Logic = () => {
                 {/* Core Stack Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
                     {techStack.map((tech, i) => (
-                        <div key={i} className="group relative p-8 rounded-[32px] bg-white/[0.02] border border-white/5 hover:border-indigo-500/30 transition-all hover:bg-white/[0.04] overflow-hidden">
+                        <div key={i} className="group relative p-8 rounded-4xl bg-white/2 border border-white/5 hover:border-indigo-500/30 transition-all hover:bg-white/4 overflow-hidden">
                             <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/5 blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
                             <tech.icon className={`w-10 h-10 mb-6 ${tech.color} transition-transform group-hover:scale-110 duration-500`} />
                             <h3 className="text-sm font-black text-white mb-2 uppercase tracking-widest">{tech.name}</h3>
@@ -81,7 +81,7 @@ const Logic = () => {
                     {logicFlows.map((flow, i) => (
                         <div key={i} className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-center gap-12 md:gap-24`}>
                             <div className="flex-1 space-y-6">
-                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-xl shadow-indigo-500/20 rotate-6">
+                                <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-xl shadow-indigo-500/20 rotate-6">
                                     <flow.icon className="w-7 h-7 text-white" />
                                 </div>
                                 <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">{flow.title}</h2>
@@ -102,8 +102,8 @@ const Logic = () => {
                             </div>
 
                             {/* Decorative Tech Graphic */}
-                            <div className="flex-1 w-full max-w-[400px]">
-                                <div className="aspect-square relative rounded-[48px] bg-gradient-to-br from-indigo-500/10 to-transparent border border-white/10 flex items-center justify-center group overflow-hidden">
+                            <div className="flex-1 w-full max-w-100">
+                                <div className="aspect-square relative rounded-[48px] bg-linear-to-br from-indigo-500/10 to-transparent border border-white/10 flex items-center justify-center group overflow-hidden">
                                     <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
                                     <div className="w-[80%] h-[80%] rounded-[40px] border border-white/5 bg-black/40 shadow-2xl backdrop-blur-3xl flex flex-col p-6 space-y-4">
                                         <div className="flex items-center gap-2">
